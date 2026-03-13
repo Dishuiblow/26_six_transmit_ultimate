@@ -92,6 +92,7 @@ int main(void)
   MX_DMA_Init();
   MX_UART8_Init();
   MX_USART6_UART_Init();
+  MX_UART7_Init();
   /* USER CODE BEGIN 2 */
   HAL_Delay(5000);
     servo_init();// 初始化卸力
@@ -105,32 +106,51 @@ int main(void)
 	  HAL_GPIO_WritePin(L6_GPIO_Port, L6_Pin, GPIO_PIN_RESET);
 	  HAL_GPIO_WritePin(L7_GPIO_Port, L7_Pin, GPIO_PIN_RESET);
 	  HAL_GPIO_WritePin(L8_GPIO_Port, L8_Pin, GPIO_PIN_RESET);
+  /* USER CODE BEGIN 2 */
+  HAL_Delay(5000);
+  servo_init();// 初始化卸力
+  
+  // 开启第一次接收（假设舵机连在 UART8）
+  HAL_UART_Receive_IT(&huart6, &uart_rx_buf[rx_index], 1); 
+  
+  // ... (省略GPIO清零代码)
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_GPIO_TogglePin(LED1_GPIO_Port,LED1_Pin);
-	  
-	  request_angle_id(0);// 请求指定ID舵机角度
-	  HAL_Delay(100);
-	  HAL_GPIO_TogglePin(LED2_GPIO_Port,LED2_Pin);
-    /* USER CODE END WHILE */
+      HAL_GPIO_TogglePin(LED1_GPIO_Port,LED1_Pin);
+      
+      request_angle_id(0); 
+      HAL_Delay(15);     
+      request_angle_id(1); 
+      HAL_Delay(15);      
+      request_angle_id(2);
+      HAL_Delay(15);      
+      request_angle_id(3); 
+      HAL_Delay(15);      
+      request_angle_id(4); 
+      HAL_Delay(15);      
+      request_angle_id(5); 
+      HAL_Delay(15);      
 
-    /* USER CODE BEGIN 3 */
-	  if (uart_rx_flag)//接收到舵机返回信息，uart_rx_flag=1
-        {
-            parse_angle();//解析角度
-			
-			for(uint8_t i=0; i<MAX_SERVO_NUM; i++) {
-                get_servo_angle(i, &angle[i]);// 获取指定ID的角度（非阻塞式）
-			}
-			memset((void *)uart_rx_buf, 0, RX_BUF_SIZE);
-		HAL_UART_Receive_IT(&huart8, &uart_rx_buf[rx_index], 1);
-        }
-      Send_Servo_Angles(angle);//发送6个舵机角度数据
-//		HAL_Delay(50);
+      HAL_GPIO_TogglePin(LED2_GPIO_Port,LED2_Pin);
+
+      if (uart_rx_flag)
+      {
+          uart_rx_flag = 0; // 清除标志位
+          parse_angle();    // 执行安全解析
+          
+          for(uint8_t i=0; i<MAX_SERVO_NUM; i++) {
+              get_servo_angle(i, &angle[i]);
+          }
+          
+          // 【注意！此处已将 memset 彻底删除！】
+          // 【中断重新开启也已经移到 RxCpltCallback 中，此处不需再写】
+      }
+      
+      Send_Servo_Angles(angle); // 发送6个舵机角度数据给PC
   }
   /* USER CODE END 3 */
 }

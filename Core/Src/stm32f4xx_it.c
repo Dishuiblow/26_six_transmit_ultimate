@@ -59,6 +59,8 @@
 extern DMA_HandleTypeDef hdma_usart6_tx;
 extern UART_HandleTypeDef huart8;
 extern UART_HandleTypeDef huart6;
+extern DMA_HandleTypeDef hdma_uart7_tx; 
+extern UART_HandleTypeDef huart7;       
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -246,3 +248,19 @@ HAL_UART_Receive_IT(&huart8, (uint8_t *)uart_rx_buf, RX_BUF_SIZE);
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
+
+/**
+  * @brief This function handles DMA1 stream1 global interrupt (UART7 TX).
+  */
+void DMA1_Stream1_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_uart7_tx);
+}
+
+/**
+  * @brief This function handles UART7 global interrupt.
+  */
+void UART7_IRQHandler(void)
+{
+  HAL_UART_IRQHandler(&huart7);
+}

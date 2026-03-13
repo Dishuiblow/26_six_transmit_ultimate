@@ -7,7 +7,7 @@
 #include "stdio.h"
 
 #define RX_BUF_SIZE 64
-#define ANGLE_RESPONSE_LEN 9	//
+#define ANGLE_RESPONSE_LEN 10	//
 #define MAX_SERVO_NUM 6  		// ID£º000~005
 void test_servo_id0(void);
 void servo_init(void);

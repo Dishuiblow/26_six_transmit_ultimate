@@ -32,13 +32,13 @@ void Send_Angle_Binary(void)
         packet.checksum += ((uint8_t *)&packet)[i];
     }
 
-    HAL_UART_Transmit_DMA(&huart6, (uint8_t *)&packet, sizeof(packet));
+    HAL_UART_Transmit_DMA(&huart7, (uint8_t *)&packet, sizeof(packet));
 }
 
 // DMA发送完成回调
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if (huart->Instance == USART6)
+    if (huart->Instance == UART7)
     {
     }
 }
@@ -88,10 +88,10 @@ void Send_Servo_Angles(uint16_t angles[6])
     send_buf[12] = (uint8_t)(angles[2] >> 8);   // 舵机2高8位
     send_buf[13] = (uint8_t)angles[3]; // 舵机3低8位
     send_buf[14] = (uint8_t)(angles[3] >> 8);   // 舵机3高8位
-		send_buf[15] = (uint8_t)angles[4]; // 舵机3低8位
-    send_buf[16] = (uint8_t)(angles[4] >> 8);   // 舵机3高8位
-		send_buf[17] = (uint8_t)angles[5]; // 舵机3低8位
-    send_buf[18] = (uint8_t)(angles[5] >> 8);   // 舵机3高8位
+    send_buf[15] = (uint8_t)angles[4]; // 舵机4低8位
+    send_buf[16] = (uint8_t)(angles[4] >> 8);   // 舵机4高8位
+	send_buf[17] = (uint8_t)angles[5]; // 舵机5低8位
+    send_buf[18] = (uint8_t)(angles[5] >> 8);   // 舵机5高8位
 
     //    // 5. 填充时间戳（可选）
     //    send_buf[15] = timestamp & 0xFF;     // 时间戳低8位
@@ -102,5 +102,5 @@ void Send_Servo_Angles(uint16_t angles[6])
     Append_CRC16_Check_Sum(send_buf, 39);
 
     // 7. 通过USART6发送（DMA模式）
-    HAL_UART_Transmit_DMA(&huart6, send_buf, sizeof(send_buf));
+    HAL_UART_Transmit_DMA(&huart7, send_buf, sizeof(send_buf));
 }
